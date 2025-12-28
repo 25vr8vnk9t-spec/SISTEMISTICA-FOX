@@ -19,22 +19,23 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
-            padding: 30px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         h1 {
             color: #333;
-            margin-bottom: 30px;
-            font-size: 24px;
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-align: center;
         }
         
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 1px solid #eee;
         }
@@ -52,13 +53,23 @@
         .input-group {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr auto;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 10px;
             align-items: center;
         }
         
+        @media (max-width: 600px) {
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-group button {
+                width: 100%;
+            }
+        }
+        
         input, select, button {
-            padding: 10px;
+            padding: 12px;
             font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -74,18 +85,22 @@
             color: white;
             border: none;
             cursor: pointer;
-            padding: 10px 15px;
+            padding: 12px 15px;
+            font-weight: bold;
         }
         
         button:hover {
             background: #d32f2f;
         }
         
+        button:active {
+            transform: scale(0.98);
+        }
+        
         .btn-add {
             background: #4CAF50;
             width: 100%;
             margin-top: 10px;
-            font-size: 16px;
         }
         
         .btn-add:hover {
@@ -104,6 +119,16 @@
             background: #1976D2;
         }
         
+        .btn-export {
+            background: #FF9800;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-export:hover {
+            background: #F57C00;
+        }
+        
         .sistema-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -111,11 +136,18 @@
             margin-top: 10px;
         }
         
+        @media (max-width: 600px) {
+            .sistema-group {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         label {
             display: block;
             margin-bottom: 5px;
             color: #666;
             font-weight: bold;
+            font-size: 14px;
         }
         
         .risultati {
@@ -155,10 +187,6 @@
             color: #f44336;
         }
         
-        .valore.positivo {
-            color: #4CAF50;
-        }
-        
         .eventi-lista {
             background: #f9f9f9;
             padding: 15px;
@@ -167,17 +195,47 @@
         }
         
         .evento-item {
-            padding: 8px;
+            padding: 10px;
             background: white;
             margin-bottom: 8px;
             border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .evento-item:last-child {
             margin-bottom: 0;
+        }
+        
+        .colonne-container {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .colonna {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .colonna-header {
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 5px;
+        }
+        
+        .colonna-eventi {
+            font-size: 14px;
+            color: #666;
         }
         
         .hidden {
@@ -191,6 +249,7 @@
             padding: 15px;
             border-radius: 4px;
             margin-top: 20px;
+            font-size: 14px;
         }
         
         .info-box {
@@ -203,12 +262,25 @@
             font-size: 14px;
             line-height: 1.5;
         }
+        
+        .riduzione-options {
+            margin-top: 15px;
+        }
+        
+        .riduzione-select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>📊 Calcolatore Sistema Scommesse</h1>
         
+        <!-- SEZIONE 1: INSERIMENTO EVENTI -->
         <div class="section">
             <h2>1. Inserisci Eventi</h2>
             <div id="eventiContainer">
@@ -227,6 +299,7 @@
             </div>
         </div>
         
+        <!-- SEZIONE 2: CONFIGURAZIONE SISTEMA -->
         <div class="section">
             <h2>2. Configura Sistema</h2>
             <div class="sistema-group">
@@ -241,25 +314,49 @@
                     <input type="number" id="budgetTotale" step="0.01" min="0" placeholder="Es. 10.00">
                 </div>
             </div>
+            
+            <div class="riduzione-options">
+                <label for="percentualeRiduzione">Percentuale colonne da giocare:</label>
+                <select id="percentualeRiduzione" class="riduzione-select">
+                    <option value="100">100% - Tutte le colonne (sistema integrale)</option>
+                    <option value="70">70% - Riduzione colonne</option>
+                    <option value="50">50% - Riduzione colonne</option>
+                </select>
+                
+                <div class="info-box">
+                    ℹ️ La riduzione serve solo a diminuire il numero di colonne giocate. Non esiste alcuna garanzia di vincita o copertura.
+                </div>
+            </div>
         </div>
         
-        <button class="btn-calc" onclick="calcolaSistema()">CALCOLA SISTEMA</button>
+        <!-- PULSANTE CALCOLA -->
+        <button class="btn-calc" onclick="calcolaSistema()">GENERA COLONNE</button>
         
+        <!-- SEZIONE 3: RISULTATI -->
         <div id="risultatiSection" class="hidden">
             <div class="risultati">
-                <h3>📈 Risultati</h3>
+                <h3>📈 Riepilogo Sistema</h3>
                 <div id="risultatiContainer"></div>
+            </div>
+            
+            <!-- COLONNE GENERATE -->
+            <div id="colonneSection" class="hidden">
+                <h3 style="margin-top: 20px; color: #333;">🎯 Colonne Generate</h3>
+                <button class="btn-export" onclick="esportaPDF()">📄 Esporta in PDF</button>
+                <div class="colonne-container" id="colonneContainer"></div>
             </div>
         </div>
         
         <div class="warning">
-            ⚠️ Questo strumento effettua solo calcoli matematici. Il gioco può causare dipendenza.
+            ⚠️ Questo strumento genera solo le colonne del sistema. Il gioco può causare dipendenza. Gioca responsabilmente.
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         let eventi = [];
         const MAX_EVENTI = 10;
+        let colonneGenerate = [];
         
         function aggiungiRigaEvento() {
             if (eventi.length >= MAX_EVENTI) {
@@ -297,7 +394,7 @@
                 return;
             }
             
-            eventi.push({ nome, pronostico, quota });
+            eventi.push({ id: eventi.length, nome, pronostico, quota });
             
             ultimaRiga.querySelector('.evento-nome').value = '';
             ultimaRiga.querySelector('.evento-pronostico').value = '';
@@ -327,6 +424,7 @@
         
         function rimuoviEvento(index) {
             eventi.splice(index, 1);
+            eventi.forEach((e, i) => e.id = i);
             aggiornaListaEventi();
             aggiornaTipiSistema();
         }
@@ -354,6 +452,35 @@
             return Math.round(result);
         }
         
+        function generaCombinazioni(arr, k) {
+            const result = [];
+            
+            function combine(start, combo) {
+                if (combo.length === k) {
+                    result.push([...combo]);
+                    return;
+                }
+                
+                for (let i = start; i < arr.length; i++) {
+                    combo.push(arr[i]);
+                    combine(i + 1, combo);
+                    combo.pop();
+                }
+            }
+            
+            combine(0, []);
+            return result;
+        }
+        
+        function shuffle(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
         function calcolaSistema() {
             if (eventi.length < 2) {
                 alert('Inserisci almeno 2 eventi');
@@ -362,6 +489,7 @@
             
             const tipoSistema = document.getElementById('tipoSistema').value;
             const budget = parseFloat(document.getElementById('budgetTotale').value);
+            const percentuale = parseInt(document.getElementById('percentualeRiduzione').value);
             
             if (!tipoSistema) {
                 alert('Seleziona il tipo di sistema');
@@ -380,24 +508,32 @@
                 return;
             }
             
-            const numCombinazioni = binomiale(eventi.length, k);
+            // Genera tutte le combinazioni
+            const tutteColonne = generaCombinazioni(eventi, k);
+            const numTotali = tutteColonne.length;
+            
+            // Mescola le colonne per una riduzione neutra
+            const colonneMischiate = shuffle(tutteColonne);
+            
+            // Applica riduzione
+            const numColonneDaGenerare = Math.ceil(numTotali * (percentuale / 100));
+            colonneGenerate = colonneMischiate.slice(0, numColonneDaGenerare);
+            
+            const numCombinazioni = colonneGenerate.length;
             const costoPerCombinazione = budget / numCombinazioni;
-            const perditaMassima = budget;
-            
-            const quoteOrdinate = [...eventi.map(e => e.quota)].sort((a, b) => a - b);
-            
-            const vincitaMinima = quoteOrdinate.slice(0, k).reduce((prod, q) => prod * q, 1) * costoPerCombinazione;
-            const vincitaMassima = quoteOrdinate.slice(-k).reduce((prod, q) => prod * q, 1) * costoPerCombinazione;
+            const spesaTotale = budget;
             
             mostraRisultati({
                 numCombinazioni,
+                numTotali,
                 costoPerCombinazione,
-                perditaMassima,
-                vincitaMinima,
-                vincitaMassima,
+                spesaTotale,
+                percentuale,
                 k,
                 n: eventi.length
             });
+            
+            mostraColonne(colonneGenerate);
         }
         
         function mostraRisultati(dati) {
@@ -406,31 +542,83 @@
             
             let html = `
                 <div class="riga-risultato">
-                    <strong>Numero combinazioni:</strong>
+                    <strong>Sistema:</strong>
+                    <span class="valore">${dati.k}/${dati.n}</span>
+                </div>
+                <div class="riga-risultato">
+                    <strong>Colonne totali possibili:</strong>
+                    <span class="valore">${dati.numTotali}</span>
+                </div>
+                <div class="riga-risultato">
+                    <strong>Colonne generate (${dati.percentuale}%):</strong>
                     <span class="valore">${dati.numCombinazioni}</span>
                 </div>
                 <div class="riga-risultato">
-                    <strong>Costo per combinazione:</strong>
+                    <strong>Costo per colonna:</strong>
                     <span class="valore">€ ${dati.costoPerCombinazione.toFixed(2)}</span>
                 </div>
                 <div class="riga-risultato">
-                    <strong>Perdita massima:</strong>
-                    <span class="valore negativo">- € ${dati.perditaMassima.toFixed(2)}</span>
-                </div>
-                <div class="riga-risultato">
-                    <strong>Intervallo teorico di vincita per singola colonna:</strong>
-                    <span class="valore positivo">€ ${dati.vincitaMinima.toFixed(2)} - € ${dati.vincitaMassima.toFixed(2)}</span>
-                </div>
-                <div class="info-box">
-                    ℹ️ Con sistema ${dati.k}/${dati.n}, ogni combinazione vincente paga in base alle quote che la compongono. 
-                    L'intervallo mostrato rappresenta l'intervallo teorico di vincita per una singola colonna, calcolato usando 
-                    le ${dati.k} quote più basse (vincita minima teorica) e le ${dati.k} quote più alte (vincita massima teorica) 
-                    tra quelle inserite.
+                    <strong>Spesa totale:</strong>
+                    <span class="valore negativo">€ ${dati.spesaTotale.toFixed(2)}</span>
                 </div>
             `;
             
             container.innerHTML = html;
             section.classList.remove('hidden');
+        }
+        
+        function mostraColonne(colonne) {
+            const container = document.getElementById('colonneContainer');
+            const section = document.getElementById('colonneSection');
+            
+            if (colonne.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            let html = '';
+            colonne.forEach((colonna, i) => {
+                const eventiStr = colonna.map(e => `${e.nome} (${e.pronostico})`).join(' • ');
+                
+                html += `
+                    <div class="colonna">
+                        <div class="colonna-header">Colonna ${i + 1}</div>
+                        <div class="colonna-eventi">${eventiStr}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            section.classList.remove('hidden');
+        }
+        
+        function esportaPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(16);
+            doc.text('Sistema Scommesse - Colonne Generate', 10, 10);
+            
+            doc.setFontSize(10);
+            let y = 20;
+            
+            colonneGenerate.forEach((colonna, i) => {
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
+                
+                const eventiStr = colonna.map(e => `${e.nome} (${e.pronostico})`).join(', ');
+                
+                doc.text(`Colonna ${i + 1}:`, 10, y);
+                y += 5;
+                
+                const lines = doc.splitTextToSize(eventiStr, 180);
+                doc.text(lines, 10, y);
+                y += lines.length * 5 + 5;
+            });
+            
+            doc.save('sistema-scommesse.pdf');
         }
     </script>
 </body>
