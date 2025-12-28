@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Sistema Scommesse</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        h2 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .input-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        input, select, button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        button {
+            background: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px 15px;
+        }
+        
+        button:hover {
+            background: #d32f2f;
+        }
+        
+        .btn-add {
+            background: #4CAF50;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        
+        .btn-add:hover {
+            background: #45a049;
+        }
+        
+        .btn-calc {
+            background: #2196F3;
+            width: 100%;
+            font-size: 18px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn-calc:hover {
+            background: #1976D2;
+        }
+        
+        .sistema-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .risultati {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        .risultati h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .riga-risultato {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .riga-risultato:last-child {
+            border-bottom: none;
+        }
+        
+        .riga-risultato strong {
+            color: #333;
+        }
+        
+        .valore {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        
+        .valore.negativo {
+            color: #f44336;
+        }
+        
+        .valore.positivo {
+            color: #4CAF50;
+        }
+        
+        .eventi-lista {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .evento-item {
+            padding: 8px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .evento-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #2196F3;
+            color: #1565c0;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Calcolatore Sistema Scommesse</h1>
+        
+        <div class="section">
+            <h2>1. Inserisci Eventi</h2>
+            <div id="eventiContainer">
+                <div class="input-group">
+                    <input type="text" placeholder="Nome evento (es. Milan - Inter)" class="evento-nome">
+                    <input type="text" placeholder="Pronostico (es. 1X)" class="evento-pronostico">
+                    <input type="number" step="0.01" min="1" placeholder="Quota" class="evento-quota">
+                    <button onclick="aggiungiEvento()">+</button>
+                </div>
+            </div>
+            <button class="btn-add" onclick="aggiungiRigaEvento()">Aggiungi altro evento</button>
+            
+            <div id="eventiInseriti" class="eventi-lista hidden">
+                <h3>Eventi inseriti:</h3>
+                <div id="listaEventi"></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>2. Configura Sistema</h2>
+            <div class="sistema-group">
+                <div>
+                    <label for="tipoSistema">Tipo di sistema:</label>
+                    <select id="tipoSistema">
+                        <option value="">Seleziona...</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="budgetTotale">Budget totale (€):</label>
+                    <input type="number" id="budgetTotale" step="0.01" min="0" placeholder="Es. 10.00">
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn-calc" onclick="calcolaSistema()">CALCOLA SISTEMA</button>
+        
+        <div id="risultatiSection" class="hidden">
+            <div class="risultati">
+                <h3>📈 Risultati</h3>
+                <div id="risultatiContainer"></div>
+            </div>
+        </div>
+        
+        <div class="warning">
+            ⚠️ Questo strumento effettua solo calcoli matematici. Il gioco può causare dipendenza.
+        </div>
+    </div>
+
+    <script>
+        let eventi = [];
+        const MAX_EVENTI = 10;
+        
+        function aggiungiRigaEvento() {
+            if (eventi.length >= MAX_EVENTI) {
+                alert(`Limite massimo di ${MAX_EVENTI} eventi raggiunto`);
+                return;
+            }
+            
+            const container = document.getElementById('eventiContainer');
+            const newRow = document.createElement('div');
+            newRow.className = 'input-group';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Nome evento" class="evento-nome">
+                <input type="text" placeholder="Pronostico" class="evento-pronostico">
+                <input type="number" step="0.01" min="1" placeholder="Quota" class="evento-quota">
+                <button onclick="aggiungiEvento()">+</button>
+            `;
+            container.appendChild(newRow);
+        }
+        
+        function aggiungiEvento() {
+            if (eventi.length >= MAX_EVENTI) {
+                alert(`Limite massimo di ${MAX_EVENTI} eventi raggiunto`);
+                return;
+            }
+            
+            const rows = document.querySelectorAll('.input-group');
+            const ultimaRiga = rows[rows.length - 1];
+            
+            const nome = ultimaRiga.querySelector('.evento-nome').value.trim();
+            const pronostico = ultimaRiga.querySelector('.evento-pronostico').value.trim();
+            const quota = parseFloat(ultimaRiga.querySelector('.evento-quota').value);
+            
+            if (!nome || !pronostico || !quota || quota < 1) {
+                alert('Compila tutti i campi correttamente');
+                return;
+            }
+            
+            eventi.push({ nome, pronostico, quota });
+            
+            ultimaRiga.querySelector('.evento-nome').value = '';
+            ultimaRiga.querySelector('.evento-pronostico').value = '';
+            ultimaRiga.querySelector('.evento-quota').value = '';
+            
+            aggiornaListaEventi();
+            aggiornaTipiSistema();
+        }
+        
+        function aggiornaListaEventi() {
+            const container = document.getElementById('listaEventi');
+            const section = document.getElementById('eventiInseriti');
+            
+            if (eventi.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            container.innerHTML = eventi.map((e, i) => `
+                <div class="evento-item">
+                    <span><strong>${e.nome}</strong> - ${e.pronostico} @ ${e.quota.toFixed(2)}</span>
+                    <button onclick="rimuoviEvento(${i})">Rimuovi</button>
+                </div>
+            `).join('');
+        }
+        
+        function rimuoviEvento(index) {
+            eventi.splice(index, 1);
+            aggiornaListaEventi();
+            aggiornaTipiSistema();
+        }
+        
+        function aggiornaTipiSistema() {
+            const select = document.getElementById('tipoSistema');
+            select.innerHTML = '<option value="">Seleziona...</option>';
+            
+            const n = eventi.length;
+            if (n < 2) return;
+            
+            for (let k = 2; k < n; k++) {
+                select.innerHTML += `<option value="${k}/${n}">${k}/${n}</option>`;
+            }
+        }
+        
+        function binomiale(n, k) {
+            if (k > n) return 0;
+            if (k === 0 || k === n) return 1;
+            
+            let result = 1;
+            for (let i = 1; i <= k; i++) {
+                result *= (n - k + i) / i;
+            }
+            return Math.round(result);
+        }
+        
+        function calcolaSistema() {
+            if (eventi.length < 2) {
+                alert('Inserisci almeno 2 eventi');
+                return;
+            }
+            
+            const tipoSistema = document.getElementById('tipoSistema').value;
+            const budget = parseFloat(document.getElementById('budgetTotale').value);
+            
+            if (!tipoSistema) {
+                alert('Seleziona il tipo di sistema');
+                return;
+            }
+            
+            if (!budget || budget <= 0) {
+                alert('Inserisci un budget valido');
+                return;
+            }
+            
+            const [k, n] = tipoSistema.split('/').map(Number);
+            
+            if (k < 2) {
+                alert('Il sistema deve contenere almeno 2 eventi per combinazione');
+                return;
+            }
+            
+            const numCombinazioni = binomiale(eventi.length, k);
+            const costoPerCombinazione = budget / numCombinazioni;
+            const perditaMassima = budget;
+            
+            const quoteOrdinate = [...eventi.map(e => e.quota)].sort((a, b) => a - b);
+            
+            const vincitaMinima = quoteOrdinate.slice(0, k).reduce((prod, q) => prod * q, 1) * costoPerCombinazione;
+            const vincitaMassima = quoteOrdinate.slice(-k).reduce((prod, q) => prod * q, 1) * costoPerCombinazione;
+            
+            mostraRisultati({
+                numCombinazioni,
+                costoPerCombinazione,
+                perditaMassima,
+                vincitaMinima,
+                vincitaMassima,
+                k,
+                n: eventi.length
+            });
+        }
+        
+        function mostraRisultati(dati) {
+            const container = document.getElementById('risultatiContainer');
+            const section = document.getElementById('risultatiSection');
+            
+            let html = `
+                <div class="riga-risultato">
+                    <strong>Numero combinazioni:</strong>
+                    <span class="valore">${dati.numCombinazioni}</span>
+                </div>
+                <div class="riga-risultato">
+                    <strong>Costo per combinazione:</strong>
+                    <span class="valore">€ ${dati.costoPerCombinazione.toFixed(2)}</span>
+                </div>
+                <div class="riga-risultato">
+                    <strong>Perdita massima:</strong>
+                    <span class="valore negativo">- € ${dati.perditaMassima.toFixed(2)}</span>
+                </div>
+                <div class="riga-risultato">
+                    <strong>Intervallo teorico di vincita per singola colonna:</strong>
+                    <span class="valore positivo">€ ${dati.vincitaMinima.toFixed(2)} - € ${dati.vincitaMassima.toFixed(2)}</span>
+                </div>
+                <div class="info-box">
+                    ℹ️ Con sistema ${dati.k}/${dati.n}, ogni combinazione vincente paga in base alle quote che la compongono. 
+                    L'intervallo mostrato rappresenta l'intervallo teorico di vincita per una singola colonna, calcolato usando 
+                    le ${dati.k} quote più basse (vincita minima teorica) e le ${dati.k} quote più alte (vincita massima teorica) 
+                    tra quelle inserite.
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            section.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
